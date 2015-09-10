@@ -33,7 +33,7 @@ class EscalationRuleset(models.Model):
 
 # dictates what to do with an alert once it's received.
 class EscalationRules(models.Model):
-    ruleset = models.ForeignKey(Ruleset)
+    escalation_ruleset = models.ForeignKey(EscalationRuleset)
     failure_time = models.IntegerField() # the amount of time (in seconds) from when the first alert is received to wait for a recovery before escalating
     max_failures = models.IntegerField() # don't escalate until X failures are received for an alert
     # TODO something about flap detection/mitigation
