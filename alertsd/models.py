@@ -27,24 +27,8 @@ class Alert(models.Model):
     # TODO something about flap detection/mitigation
     # TODO escalation persistence
 
-# this is a set of alert criteria you'd use to decide which 
-# ruleset to implement for an alert.
-# It's basically regex rules that apply to either the headers or the body
-# of the alert.
-#class AlertRules(models.Model):
-#    alert = models.ForeignKey(Alert)
-#    pattern_type = models.CharField(max_length=64) # header, message
-#    pattern = models.CharField(max_length=255)
-
 class EscalationTarget(models.Model):
     user = models.ForeignKey(User)
     escalation_type = models.CharField(max_length=10) # email, HTTP, script
     escalate_every = models.IntegerField(default=0) # setting this to >0 will result in a recurring escalation
-
-# dictates what to do with an alert once it's received.
-#class EscalationRules(models.Model):
-#    escalation_ruleset = models.ForeignKey(EscalationRuleset)
-#    failure_time = models.IntegerField() # the amount of time (in seconds) from when the first alert is received to wait for a recovery before escalating
-#    max_failures = models.IntegerField() # don't escalate until X failures are received for an alert
-#    # TODO something about flap detection/mitigation
 
