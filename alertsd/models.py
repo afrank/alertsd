@@ -2,7 +2,7 @@ from django.db import models
 
 # this is the top level auth model
 class User(models.Model):
-    api_key = models.CharField(max_length=64)
+    api_key = models.CharField(max_length=64, unique=True)
 
 class Escalation(models.Model):
     user = models.ForeignKey(User)
@@ -12,7 +12,7 @@ class Escalation(models.Model):
 
 # the structure of an alert as it traverses the system.
 class Alert(models.Model):
-    alert_key = models.CharField(max_length=255) # this is the key used to call this alert in the API
+    alert_key = models.CharField(max_length=255, unique=True) # this is the key used to call this alert in the API
     escalation = models.ForeignKey(Escalation)
     created_on = models.DateTimeField(auto_now_add=True,auto_now=False)
     failure_time = models.IntegerField() # the amount of time (in seconds) from when the first alert is received to wait for a recovery before escalating
@@ -20,3 +20,9 @@ class Alert(models.Model):
     # TODO something about flap detection/mitigation
     # TODO escalation persistence
 
+# this is basically a cache where active escalations will be tracked.
+class Incident(models.Model):
+    alert = models.ForeignKey(Alert, unique=True) # unique -- can only have one active instnace of an alert at a time
+    failure_count = models.IntegerField(default=0)
+    created_on = models.DateTimeField(auto_now_add=True,auto_now=False)
+    updated_on = models.DateTimeField(auto_now_add=True,auto_now=True)
