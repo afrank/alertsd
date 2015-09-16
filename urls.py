@@ -25,5 +25,8 @@ urlpatterns = patterns('',
     url(r'^a/alert/$', AlertResource.as_list(), name='api_alert_list'),
     url(r'^a/alert/(?P<pk>\d+)/$', AlertResource.as_detail(), name='api_alert_detail'),
 
+    url(r'^a/incident/$', IncidentResource.as_list(), name='api_incident_list'),
+    url(r'^a/incident/(?P<pk>\d+)/$', IncidentResource.as_detail(), name='api_incident_detail'),
+
     url(r'^alert/$', AlertEndpoint.as_view(), name='AlertEndpoint'),
 )
