@@ -16,6 +16,7 @@ class EscalationResource(DjangoResource):
         'user_id': 'user_id',
         'escalation_type': 'escalation_type',
         'escalation_interval': 'escalation_interval',
+        'endpoint': 'endpoint',
     })
     def list(self):
         return Escalation.objects.all()
@@ -30,7 +31,8 @@ class EscalationResource(DjangoResource):
         return Escalation.objects.create(
             user_id=self.data['user_id'],
             escalation_type=self.data['escalation_type'],
-            escalation_interval=self.data['escalation_interval']
+            escalation_interval=self.data['escalation_interval'],
+            endpoint=self.data['endpoint']
         )
 
     def update(self, pk):
@@ -45,6 +47,8 @@ class EscalationResource(DjangoResource):
             escalation.escalation_type = self.data['escalation_type']
         if 'escalation_interval' in self.data:
             escalation.escalation_interval = self.data['escalation_interval']
+        if 'endpoint' in self.data:
+            escalation.endpoint = self.data['endpoint']
         escalation.save()
         return escalation
 

@@ -58,5 +58,5 @@ class AlertResource(DjangoResource):
             alert = Alert.objects.get(id=pk)
         except Alert.DoesNotExist:
             raise BadRequest("Alert not found.")
-        Alert.delete()
+        alert.delete()
 

@@ -6,6 +6,8 @@ from restless.views import Endpoint
 
 from restless.exceptions import BadRequest
 
+from alertsd.alert_thread import start_incident_thread
+
 # 
 # Alert Handler. This interfaces with the 
 # celery code. A request requires 3 things:
@@ -34,5 +36,17 @@ class AlertEndpoint(Endpoint):
 
         # check for an existing escalation.
         incident = list(Incident.objects.filter(alert_id=alert.id))
+        if len(incident) > 0:
+            if action == "resolve":
+                # NO LOGS!!!!
+                incident[0].delete()
+            elif action == "trigger":
+                incident[0].failure_count += 1
+                incident[0].save()
+        else:
+            # no previously-reported incident, let's trigger one
+            incident = Incident.objects.create(alert_id=alert.id, failure_count=1)
+            start_incident_thread.delay(incident.id)
+            
         return []
 
