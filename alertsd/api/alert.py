@@ -16,6 +16,7 @@ class AlertResource(DjangoResource):
         'escalation_id': 'escalation_id',
         'alert_key': 'alert_key',
         'failure_time': 'failure_time',
+        'failure_expiration': 'failure_expiration',
         'max_failures': 'max_failures',
         'created_on': 'created_on'
     })
@@ -33,6 +34,7 @@ class AlertResource(DjangoResource):
             alert_key=self.data['alert_key'],
             escalation_id=self.data['escalation_id'],
             failure_time=self.data['failure_time'],
+            failure_expiration=self.data['failure_expiration'],
             max_failures=self.data['max_failures']
         )
 
@@ -50,6 +52,8 @@ class AlertResource(DjangoResource):
             alert.failure_time = self.data['failure_time']
         if 'max_failures' in self.data:
             alert.max_failures = self.data['max_failures']
+        if 'failure_expiration' in self.data:
+            alert.failure_expiration = self.data['failure_expiration']
         alert.save()
         return alert
 

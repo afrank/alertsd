@@ -22,7 +22,7 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 #
 #)
 
-from alertsd import alert_thread
+from alertsd import async
 
 @app.task(bind=True)
 def debug_task(self):

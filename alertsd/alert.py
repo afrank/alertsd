@@ -6,14 +6,14 @@ from restless.views import Endpoint
 
 from restless.exceptions import BadRequest
 
-from alertsd.alert_thread import start_incident_thread
+from alertsd.async import start_incident_thread
 
 # 
 # Alert Handler. This interfaces with the 
 # celery code. A request requires 3 things:
 # - api_key
 # - alert_key
-# - action: problem|recovery
+# - action: trigger|resolve
 #
 class AlertEndpoint(Endpoint):
     def post(self,request):
@@ -37,16 +37,18 @@ class AlertEndpoint(Endpoint):
         # check for an existing escalation.
         incident = list(Incident.objects.filter(alert_id=alert.id))
         if len(incident) > 0:
+            incident = incident[0]
             if action == "resolve":
                 # NO LOGS!!!!
-                incident[0].delete()
+                incident.delete()
+                return []
             elif action == "trigger":
-                incident[0].failure_count += 1
-                incident[0].save()
+                incident.failure_count += 1
+                incident.save()
         else:
             # no previously-reported incident, let's trigger one
             incident = Incident.objects.create(alert_id=alert.id, failure_count=1)
             start_incident_thread.delay(incident.id)
             
-        return []
+        return {"alert_id":incident.alert_id, "failure_count":incident.failure_count, "created_on":incident.created_on, "updated_on":incident.updated_on}
 
