@@ -31,8 +31,19 @@ def start_incident_thread(incident_id):
             # ESCALATE!
             print "Escalating incident_id %s alert_id %s" % (str(incident_id), str(alert.id))
             escalation = Escalation.objects.get(pk=alert.escalation_id)
-            if escalation.escalation_type == "stdout":
-                print "STDOUT Escalation for %s" % str(alert.alert_key)
+            import subprocess
+            import os
+
+            if not os.path.isfile(escalation.plugin_path):
+                print "Cannot escalate because plugin does not exist: %s" % escalation.plugin_path
+                incident.delete()
+                break
+
+            sub_env = os.environ.copy()
+            sub_env["ALERT_KEY"] = str(alert.alert_key)
+            sub_env["FAILURE_COUNT"] = str(incident.failure_count)
+            sub_env["INCIDENT_START"] = str(start_time)
+            subprocess.Popen(escalation.plugin_path, env=sub_env)            
             incident.delete()
             break
         elif alert.failure_time == 0 and alert.failure_expiration > 0 and last_trigger > 0 and now-last_trigger > alert.failure_expiration:

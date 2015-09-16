@@ -6,9 +6,10 @@ class User(models.Model):
 
 class Escalation(models.Model):
     user = models.ForeignKey(User)
-    escalation_type = models.CharField(max_length=10) # email, HTTP, script, stdout
+    #escalation_type = models.CharField(max_length=10) # email, HTTP, plugin (script), stdout TODO
     escalation_interval = models.IntegerField(default=0) # setting this to >0 will result in a recurring escalation
-    endpoint = models.CharField(max_length=255) # this will be an email address, a script, or a url. TODO: HTTP type support will require a lot more stuff to be awesome.
+    #endpoint = models.CharField(max_length=255) # this will be an email address, a script path (plugin), or a url. TODO: HTTP type support will require a lot more stuff to be awesome.
+    plugin_path = models.CharField(max_length=255) # this is just a script path where stuff will get passed to as environment variables
 
 # the structure of an alert as it traverses the system.
 class Alert(models.Model):

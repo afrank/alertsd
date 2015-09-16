@@ -14,9 +14,8 @@ class EscalationResource(DjangoResource):
     preparer = FieldsPreparer(fields={
         'id': 'id',
         'user_id': 'user_id',
-        'escalation_type': 'escalation_type',
         'escalation_interval': 'escalation_interval',
-        'endpoint': 'endpoint',
+        'plugin_path': 'plugin_path',
     })
     def list(self):
         return Escalation.objects.all()
@@ -30,9 +29,8 @@ class EscalationResource(DjangoResource):
     def create(self):
         return Escalation.objects.create(
             user_id=self.data['user_id'],
-            escalation_type=self.data['escalation_type'],
             escalation_interval=self.data['escalation_interval'],
-            endpoint=self.data['endpoint']
+            plugin_path=self.data['plugin_path']
         )
 
     def update(self, pk):
@@ -43,12 +41,10 @@ class EscalationResource(DjangoResource):
 
         if 'user_id' in self.data:
             escalation.api_key = self.data['user_id']
-        if 'escalation_type' in self.data:
-            escalation.escalation_type = self.data['escalation_type']
         if 'escalation_interval' in self.data:
             escalation.escalation_interval = self.data['escalation_interval']
-        if 'endpoint' in self.data:
-            escalation.endpoint = self.data['endpoint']
+        if 'plugin_path' in self.data:
+            escalation.plugin_path = self.data['plugin_path']
         escalation.save()
         return escalation
 
