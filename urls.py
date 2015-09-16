@@ -10,6 +10,7 @@ from alertsd.default import *
 from alertsd.a.user import *
 from alertsd.a.escalation import *
 from alertsd.a.alert import *
+from alertsd.a.incident import *
 
 from alertsd.alert.endpoint import *
 
