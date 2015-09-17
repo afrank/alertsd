@@ -12,3 +12,4 @@ Another benefit of something like this is it gives you an escalation proxy, so i
 To try this out, you'll need Python-Django, RabbitMQ and celery. Once you've installed those things, started your rabbitmq daemon and cloned this repo, run ```python manage.py syncdb```. You can then run the dev server with ```python manage.py runserver 0.0.0.0:8000```. To start your celery worker, run ```celery -A alertsd worker -l info```.
 
 Assuming all of that worked, you can create some data in your db by running ```./create_db.sh```. Then to play around with triggering and resolving incidents, run ```./trigger.sh``` and ```./resolve.sh```.
+

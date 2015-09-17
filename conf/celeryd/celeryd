@@ -1,0 +1,18 @@
+ENABLED="true"
+CELERYD_NODES="localhost"
+
+# Where to chdir at start.
+CELERYD_CHDIR="/opt/alertsd/"
+
+# Extra arguments to celeryd
+CELERYD_OPTS="--time-limit=300 --concurrency=8"
+
+# Name of the celery config module.
+CELERY_CONFIG_MODULE="celeryconfig"
+
+# %n will be replaced with the nodename.
+CELERYD_LOG_FILE="/var/log/celery/%n.log"
+
+# Workers should run as an unprivileged user.
+CELERYD_USER="celery"
+CELERYD_GROUP="celery"
