@@ -21,18 +21,30 @@ class AlertResource(DjangoResource):
         'created_on': 'created_on'
     })
     def list(self):
-        return Alert.objects.all()
+        return Alert.objects.filter(escalation__user_id=self.user.id)
 
     def detail(self, pk):
-        return Alert.objects.get(id=pk)
+        return Alert.objects.get(id=pk, escalation__user_id=self.user.id)
 
     def is_authenticated(self):
+        if "HTTP_AUTH_TOKEN" in self.request.META:
+            auth_token = self.request.META["HTTP_AUTH_TOKEN"]
+        else:
+            return False
+        try:
+            self.user = User.objects.get(api_key=auth_token)
+        except User.DoesNotExist:
+            return False
         return True
 
     def create(self):
+        try:
+            escalation = Escalation.objects.get(id=self.data['escalation_id'], user_id=self.user.id)
+        except Escalation.DoesNotExist:
+            raise BadRequest("Escalation Does Not Exist")
         return Alert.objects.create(
             alert_key=self.data['alert_key'],
-            escalation_id=self.data['escalation_id'],
+            escalation_id=escalation.id,
             failure_time=self.data['failure_time'],
             failure_expiration=self.data['failure_expiration'],
             max_failures=self.data['max_failures']
@@ -42,12 +54,16 @@ class AlertResource(DjangoResource):
         try:
             alert = Alert.objects.get(id=pk)
         except Alert.DoesNotExist:
-            alert = Alert()
+            raise BadRequest("Alert Not Found")
 
         if 'alert_key' in self.data:
             alert.alert_key = self.data['alert_key']
         if 'escalation_id' in self.data:
-            alert.escalation_id = self.data['escalation_id']
+            try:
+                escalation = Escalation.objects.get(self.data['escalation_id'], user_id=self.user.id)
+            except Escalation.DoesNotExist:
+                raise BadRequest("Escalation Does Not Exist")
+            alert.escalation_id = escalation.id
         if 'failure_time' in self.data:
             alert.failure_time = self.data['failure_time']
         if 'max_failures' in self.data:
@@ -59,7 +75,7 @@ class AlertResource(DjangoResource):
 
     def delete(self, pk):
         try:
-            alert = Alert.objects.get(id=pk)
+            alert = Alert.objects.get(id=pk, escalation__user_id=self.user.id)
         except Alert.DoesNotExist:
             raise BadRequest("Alert not found.")
         alert.delete()

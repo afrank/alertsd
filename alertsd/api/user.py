@@ -22,6 +22,9 @@ class UserResource(DjangoResource):
         return User.objects.get(id=pk)
 
     def is_authenticated(self):
+        whitelisted_ips = ['127.0.0.1']
+        if self.request.META.get('REMOTE_ADDR') not in whitelisted_ips:
+            return False
         return True
 
     def create(self):

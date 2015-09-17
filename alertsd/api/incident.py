@@ -19,25 +19,41 @@ class IncidentResource(DjangoResource):
         'updated_on': 'updated_on'
     })
     def list(self):
-        return Incident.objects.all()
+        return Incident.objects.filter(alert__escalation__user_id=self.user.id)
 
     def detail(self, pk):
-        return Incident.objects.get(id=pk)
+        return Incident.objects.get(id=pk, alert__escalation__user_id=self.user.id)
 
     def is_authenticated(self):
+        if "HTTP_AUTH_TOKEN" in self.request.META:
+            auth_token = self.request.META["HTTP_AUTH_TOKEN"]
+        else:
+            return False
+        try:
+            self.user = User.objects.get(api_key=auth_token)
+        except User.DoesNotExist:
+            return False
         return True
 
     def create(self):
-        return Incident.objects.create(alert_id=self.data['alert_id'])
+        try:
+            alert = Alert.objects.get(alert_id=self.data['alert_id'], alert__escalation__user_id=self.user.id)
+        except Alert.DoesNotExist:
+            raise BadRequest("Alert Not Found")
+        return Incident.objects.create(alert_id=alert.id)
 
     def update(self, pk):
         try:
-            incident = Incident.objects.get(id=pk)
+            incident = Incident.objects.get(id=pk, alert__escalation__user_id=self.user.id)
         except Incident.DoesNotExist:
-            incident = Incident()
+            raise BadRequest("Incident Not Found")
 
         if 'alert_id' in self.data:
-            incident.alert_id = self.data['alert_id']
+            try:
+                alert = Alert.objects.get(id=self.data['alert_id'], escalation__user_id=self.user.id)
+            except Alert.DoesNotExist:
+                raise BadRequest("Alert Not Found")
+            incident.alert_id = alert.id
         if 'failure_count' in self.data:
             incident.failure_count = self.data['failure_count']
         incident.save()
@@ -45,7 +61,7 @@ class IncidentResource(DjangoResource):
 
     def delete(self, pk):
         try:
-            incident = Incident.objects.get(id=pk)
+            incident = Incident.objects.get(id=pk, alert__escalation__user_id=self.user.id)
         except Incident.DoesNotExist:
             raise BadRequest("Incident not found.")
         incident.delete()

@@ -30,14 +30,18 @@ class AlertEndpoint(Endpoint):
         else:
             raise BadRequest("Action Required")
         try:
-            alert = Alert.objects.get(alert_key=alert_key)
+            user = User.objects.get(api_key=auth_token)
+        except User.DoesNotExist:
+            raise BadRequest("User Does Not Exist")
+
+        try:
+            alert = Alert.objects.get(alert_key=alert_key,escalation__user_id=user.id)
         except Alert.DoesNotExist:
             raise BadRequest("Specified Alert Does Not Exist.")
 
         # check for an existing escalation.
-        incident = list(Incident.objects.filter(alert_id=alert.id))
-        if len(incident) > 0:
-            incident = incident[0]
+        try:
+            incident = Incident.objects.get(alert_id=alert.id)
             if action == "resolve":
                 # NO LOGS!!!!
                 incident.delete()
@@ -45,10 +49,9 @@ class AlertEndpoint(Endpoint):
             elif action == "trigger":
                 incident.failure_count += 1
                 incident.save()
-        else:
-            # no previously-reported incident, let's trigger one
+        except Incident.DoesNotExist:
             incident = Incident.objects.create(alert_id=alert.id, failure_count=1)
             start_incident_thread.delay(incident.id)
-            
+
         return {"alert_id":incident.alert_id, "failure_count":incident.failure_count, "created_on":incident.created_on, "updated_on":incident.updated_on}
 
