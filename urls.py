@@ -11,6 +11,8 @@ from alertsd.api.user import UserResource
 from alertsd.api.escalation import EscalationResource
 from alertsd.api.alert import AlertResource
 from alertsd.api.incident import IncidentResource
+from alertsd.api.plugin import PluginResource
+from alertsd.api.plugin_parameter import PluginParameterResource
 
 from alertsd.alert import AlertEndpoint
 
@@ -28,6 +30,12 @@ urlpatterns = patterns('',
 
     url(r'^api/incident/$', IncidentResource.as_list(), name='api_incident_list'),
     url(r'^api/incident/(?P<pk>\d+)/$', IncidentResource.as_detail(), name='api_incident_detail'),
+
+    url(r'^api/plugin/$', PluginResource.as_list(), name='api_plugin_list'),
+    url(r'^api/plugin/(?P<pk>\d+)/$', PluginResource.as_detail(), name='api_plugin_detail'),
+
+    url(r'^api/plugin/parameter/$', PluginParameterResource.as_list(), name='api_plugin_parameter_list'),
+    url(r'^api/plugin/parameter/(?P<pk>\d+)/$', PluginParameterResource.as_detail(), name='api_plugin_parameter_detail'),
 
     url(r'^alert/$', AlertEndpoint.as_view(), name='AlertEndpoint'),
 )

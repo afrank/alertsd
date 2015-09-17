@@ -31,12 +31,15 @@ def start_incident_thread(incident_id):
             # ESCALATE!
             print "Escalating incident_id %s alert_id %s" % (str(incident_id), str(alert.id))
             escalation = Escalation.objects.get(pk=alert.escalation_id)
+            plugin = Plugin.objects.get(pk=escalation.plugin_id)
+            plugin_parameters = list(PluginParameter.objects.filter(plugin_id=plugin.id))
             import subprocess
             import os
 
-            plugin = "plugins/%s" % escalation.plugin
-            if not os.path.isfile(plugin):
-                print "Cannot escalate because plugin does not exist: %s" % plugin
+
+            plugin_path = "plugins/%s" % plugin.path
+            if not os.path.isfile(plugin_path):
+                print "Cannot escalate because plugin does not exist: %s" % plugin_path
                 incident.delete()
                 break
 
@@ -44,7 +47,24 @@ def start_incident_thread(incident_id):
             sub_env["ALERT_KEY"] = str(alert.alert_key)
             sub_env["FAILURE_COUNT"] = str(incident.failure_count)
             sub_env["INCIDENT_START"] = str(start_time)
-            subprocess.Popen(plugin, env=sub_env)            
+            if len(plugin_parameters) > 0:
+                for parameter in plugin_parameters:
+                    sub_env[parameter.key] = str(parameter.value)
+            if ',' in plugin.required_parameters:
+                required_parameters = plugin.required_parameters.split(',')
+            elif plugin.required_parameters <> "":
+                required_parameters = [plugin.required_parameters]
+            else:
+                required_parameters = []
+            missing_params = []
+            for p in required_parameters:
+                if p.strip() not in sub_env:
+                    missing_params += [p.strip()]
+            if len(missing_params) > 0:
+                print "Cannot escalate because required parameters are missing: ", missing_params
+                incident.delete()
+                break
+            subprocess.Popen(plugin_path, env=sub_env)            
             incident.delete()
             break
         elif alert.failure_time == 0 and alert.failure_expiration > 0 and last_trigger > 0 and now-last_trigger > alert.failure_expiration:

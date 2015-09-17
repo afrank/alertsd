@@ -52,7 +52,7 @@ class AlertResource(DjangoResource):
 
     def update(self, pk):
         try:
-            alert = Alert.objects.get(id=pk)
+            alert = Alert.objects.get(id=pk, escalation__user_id=self.user.id)
         except Alert.DoesNotExist:
             raise BadRequest("Alert Not Found")
 

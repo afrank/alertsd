@@ -14,7 +14,7 @@ class EscalationResource(DjangoResource):
         'id': 'id',
         'user_id': 'user_id',
         'escalation_interval': 'escalation_interval',
-        'plugin': 'plugin',
+        'plugin_id': 'plugin_id',
     })
     def list(self):
         return Escalation.objects.filter(user_id=self.user.id)
@@ -37,7 +37,7 @@ class EscalationResource(DjangoResource):
         return Escalation.objects.create(
             user_id=self.user.id,
             escalation_interval=self.data['escalation_interval'],
-            plugin=self.data['plugin']
+            plugin_id=self.data['plugin_id']
         )
 
     def update(self, pk):
@@ -46,12 +46,10 @@ class EscalationResource(DjangoResource):
         except Escalation.DoesNotExist:
             raise BadRequest("Escalation not found.")
 
-        if 'user_id' in self.data:
-            escalation.api_key = self.data['user_id']
         if 'escalation_interval' in self.data:
             escalation.escalation_interval = self.data['escalation_interval']
-        if 'plugin' in self.data:
-            escalation.plugin = self.data['plugin']
+        if 'plugin_id' in self.data:
+            escalation.plugin_id = self.data['plugin_id']
         escalation.save()
         return escalation
 

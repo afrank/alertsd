@@ -29,6 +29,10 @@ class AlertEndpoint(Endpoint):
             action = request.data.get('action')
         else:
             raise BadRequest("Action Required")
+        if "comment" in request.data:
+            comment = request.data.get('comment')
+        else:
+            comment = ""
         try:
             user = User.objects.get(api_key=auth_token)
         except User.DoesNotExist:
@@ -38,6 +42,15 @@ class AlertEndpoint(Endpoint):
             alert = Alert.objects.get(alert_key=alert_key,escalation__user_id=user.id)
         except Alert.DoesNotExist:
             raise BadRequest("Specified Alert Does Not Exist.")
+
+        # see if there are any filters that would prevent this from triggering
+        if comment <> "":
+            filters = list(AlertFilter.objects.filter(alert_id=alert.id))
+            if len(filters) > 0:
+                import re
+                for f in filters:
+                    if re.match(f.regex,comment) is not None:
+                        return {'msg':'Not Triggering since comment string matches associated filter %s' % str(f.id)}
 
         # check for an existing escalation.
         try:
