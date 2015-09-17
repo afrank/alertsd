@@ -13,3 +13,6 @@ To try this out, you'll need Python-Django, RabbitMQ and celery. Once you've ins
 
 Assuming all of that worked, you can create some data in your db by running ```./create_db.sh```. Then to play around with triggering and resolving incidents, run ```./trigger.sh``` and ```./resolve.sh```.
 
+## Installing
+
+When you're done trying it out, you can take a few steps to install it in a more productized way. Have a look at the included [install.sh](install.sh). You will need RabbitMQ, Celeryd, Supervisor, Nginx, Gunicorn and Django. If you've got all that stuff installed, then you should be able to simply run the install script. 
