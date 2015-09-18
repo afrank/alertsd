@@ -16,7 +16,10 @@ Assuming all of that worked, you can create some data in your db by running ```.
 
 When you're done trying it out, you can take a few steps to install it in a more productized way. Have a look at the included [install.sh](install.sh). You will need RabbitMQ, Celeryd, Supervisor, Nginx, Gunicorn and Django. If you've got all that stuff installed, then you should be able to simply run the install script. 
 
+Running these commands should result in a running alertsd instance on your vanilla ubuntu 14 box:
+```
 sudo apt-get install -y git-core
 git clone https://github.com/afrank/alertsd.git
 cd alertsd
 sudo ./install.sh
+```
