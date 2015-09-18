@@ -1,5 +1,4 @@
 # alertsd
-A statsd-like concept for alerts
 
 Doing alerts right is kinda hard. In the glorious world of devops, you want to do adhoc alerting, where you've got a few different products all implementing their own alerting rules, tied in to any number of things. Finding something wrong and sending an alert? Not that tough. But introducing things like escalations, flap detection, check intervals, notification intervals, and any number of other things you can find in such things as Nagios are non-trivial to implement, and take away from more important tasks. Ok, so why not just use nagios, or something like it. Well, you can! But setting nagios up is non-trivial, especially for a developer who's not otherwise inclined to do ops stuff, and with nagios comes lots of stuff you maybe don't want.
 
