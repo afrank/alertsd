@@ -19,8 +19,9 @@ cd $DJANGODIR
 
 # Start your Django Unicorn
 # Programs meant to be run under supervisor should not daemonize themselves (do not use --daemon)
-exec /usr/local/bin/gunicorn ${DJANGO_WSGI_MODULE}:application \
+exec `which gunicorn` ${DJANGO_WSGI_MODULE}:application \
   --name $NAME \
   --workers $NUM_WORKERS \
   --user $USER \
+  --settings $DJANGO_SETTINGS_MODULE \
   --bind=unix:$SOCKFILE
