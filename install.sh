@@ -1,9 +1,10 @@
 #!/bin/bash
 
-apt-get install rabbitmq-server celeryd python-django gunicorn supervisor nginx python-pip
-pip install DjangoRestless
+apt-get update
+apt-get install -y rabbitmq-server celeryd python-django gunicorn supervisor nginx python-pip
+pip install DjangoRestless restless
 
-python manage.php syncdb
+python manage.py syncdb
 
 rsync -av --exclude=.git --exclude="*.pyc" ./ /opt/alertsd/
 [[ -d /opt/alertsd/run ]] || mkdir /opt/alertsd/run
