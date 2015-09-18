@@ -9,6 +9,8 @@ sudo apt-get remove -y librabbitmq1
 pip install DjangoRestless restless
 
 python manage.py syncdb --noinput
+chmod 660 db.sqlite3
+adduser celery www-data
 
 rsync -av --exclude=.git --exclude="*.pyc" ./ /opt/alertsd/
 [[ -d /opt/alertsd/run ]] || mkdir /opt/alertsd/run

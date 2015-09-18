@@ -65,7 +65,8 @@ def start_incident_thread(incident_id):
                 print "Cannot escalate because required parameters are missing: ", missing_params
                 incident.delete()
                 break
-            subprocess.Popen(plugin_path, env=sub_env)            
+            print "Starting subprocess for %s" % plugin_path
+            print(subprocess.Popen(plugin_path, env=sub_env))
             incident.delete()
             break
         elif alert.failure_time == 0 and alert.failure_expiration > 0 and last_trigger > 0 and now-last_trigger > alert.failure_expiration:
