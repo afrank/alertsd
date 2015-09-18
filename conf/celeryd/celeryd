@@ -1,6 +1,8 @@
 ENABLED="true"
 CELERYD_NODES="localhost"
 
+CELERY_APP="alertsd"
+
 # Where to chdir at start.
 CELERYD_CHDIR="/opt/alertsd/"
 
