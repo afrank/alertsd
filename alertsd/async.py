@@ -43,10 +43,10 @@ def start_incident_thread(incident_id):
                 break
 
             sub_env = os.environ.copy()
-            sub_env["ALERT_KEY"] = str(alert.alert_key)
+            sub_env["ALERT_KEY"] = str(alert.key)
             sub_env["FAILURE_COUNT"] = str(incident.failure_count)
             sub_env["INCIDENT_START"] = str(start_time)
-            sub_env["INCIDENT_DETAILS"] = str(incident.comment)
+            sub_env["INCIDENT_DETAILS"] = str(incident.value)
             if len(plugin_parameters) > 0:
                 for parameter in plugin_parameters:
                     sub_env[parameter.key] = str(parameter.value)

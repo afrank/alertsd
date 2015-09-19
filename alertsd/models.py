@@ -27,7 +27,7 @@ class PluginParameter(models.Model):
 
 # the structure of an alert as it traverses the system.
 class Alert(models.Model):
-    alert_key = models.CharField(max_length=255, unique=True) # this is the key used to call this alert in the API
+    key = models.CharField(max_length=255, unique=True) # this is the key used to call this alert in the API
     plugin = models.ForeignKey(Plugin)
     created_on = models.DateTimeField(auto_now_add=True,auto_now=False)
     failure_time = models.IntegerField(default=0) # the amount of time (in seconds) from when the first alert is received to wait for a recovery before escalating
@@ -39,8 +39,8 @@ class Alert(models.Model):
 
 # this is basically a cache where active escalations will be tracked.
 class Incident(models.Model):
-    alert = models.ForeignKey(Alert, unique=True) # unique -- can only have one active instnace of an alert at a time
-    comment = models.CharField(max_length=255, default="")
+    alert = models.ForeignKey(Alert)
+    value = models.CharField(max_length=255, default="")
     failure_count = models.IntegerField(default=0)
     created_on = models.DateTimeField(auto_now_add=True,auto_now=False)
     updated_on = models.DateTimeField(auto_now_add=True,auto_now=True)

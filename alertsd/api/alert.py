@@ -14,7 +14,7 @@ class AlertResource(DjangoResource):
     preparer = FieldsPreparer(fields={
         'id': 'id',
         'escalation_id': 'escalation_id',
-        'alert_key': 'alert_key',
+        'key': 'key',
         'failure_time': 'failure_time',
         'failure_expiration': 'failure_expiration',
         'max_failures': 'max_failures',
@@ -43,7 +43,7 @@ class AlertResource(DjangoResource):
         except Escalation.DoesNotExist:
             raise BadRequest("Escalation Does Not Exist")
         return Alert.objects.create(
-            alert_key=self.data['alert_key'],
+            key=self.data['key'],
             escalation_id=escalation.id,
             failure_time=self.data['failure_time'],
             failure_expiration=self.data['failure_expiration'],
@@ -56,8 +56,8 @@ class AlertResource(DjangoResource):
         except Alert.DoesNotExist:
             raise BadRequest("Alert Not Found")
 
-        if 'alert_key' in self.data:
-            alert.alert_key = self.data['alert_key']
+        if 'key' in self.data:
+            alert.key = self.data['key']
         if 'escalation_id' in self.data:
             try:
                 escalation = Escalation.objects.get(self.data['escalation_id'], user_id=self.user.id)

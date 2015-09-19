@@ -10,9 +10,10 @@ from alertsd.async import start_incident_thread
 
 # 
 # Alert Handler. This interfaces with the 
-# celery code. A request requires 3 things:
+# celery code. A request requires 3 things (with an optional "value"):
 # - api_key
-# - alert_key
+# - key
+# - value
 # - action: trigger|resolve
 #
 class AlertEndpoint(Endpoint):
@@ -22,39 +23,39 @@ class AlertEndpoint(Endpoint):
         else:
             raise BadRequest("Auth Token Required")
         if "key" in request.data:
-            alert_key = request.data.get('key')
+            key = request.data.get('key')
         else:
             raise BadRequest("Alert Key Required")
         if "action" in request.data:
             action = request.data.get('action')
         else:
             raise BadRequest("Action Required")
-        if "comment" in request.data:
-            comment = request.data.get('comment')
+        if "value" in request.data:
+            value = request.data.get('value')
         else:
-            comment = ""
+            value = ""
         try:
             user = User.objects.get(api_key=auth_token)
         except User.DoesNotExist:
             raise BadRequest("User Does Not Exist")
 
         try:
-            alert = Alert.objects.get(alert_key=alert_key,escalation__user_id=user.id)
+            alert = Alert.objects.get(key=key,escalation__user_id=user.id)
         except Alert.DoesNotExist:
             raise BadRequest("Specified Alert Does Not Exist.")
 
         # see if there are any filters that would prevent this from triggering
-        if comment <> "":
+        if value <> "":
             filters = list(AlertFilter.objects.filter(alert_id=alert.id))
             if len(filters) > 0:
                 import re
                 for f in filters:
-                    if re.match(f.regex,comment) is not None:
-                        return {'msg':'Not Triggering since comment string matches associated filter %s' % str(f.id)}
+                    if re.match(f.regex,value) is not None:
+                        return {'msg':'Not Triggering since value string matches associated filter %s' % str(f.id)}
 
         # check for an existing escalation.
         try:
-            incident = Incident.objects.get(alert_id=alert.id)
+            incident = Incident.objects.get(alert_id=alert.id,value=value)
             if action == "resolve":
                 # NO LOGS!!!!
                 incident.delete()
@@ -66,5 +67,5 @@ class AlertEndpoint(Endpoint):
             incident = Incident.objects.create(alert_id=alert.id, failure_count=1)
             start_incident_thread.delay(incident.id)
 
-        return {"alert_id":incident.alert_id, "failure_count":incident.failure_count, "created_on":incident.created_on, "updated_on":incident.updated_on}
+        return {"alert_id":incident.alert_id, "key":alert.key, "value":incident.value, "failure_count":incident.failure_count, "created_on":incident.created_on, "updated_on":incident.updated_on}
 
