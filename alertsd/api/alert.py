@@ -39,12 +39,12 @@ class AlertResource(DjangoResource):
 
     def create(self):
         try:
-            escalation = Escalation.objects.get(id=self.data['escalation_id'], user_id=self.user.id)
-        except Escalation.DoesNotExist:
-            raise BadRequest("Escalation Does Not Exist")
+            plugin = Plugin.objects.get(id=self.data['plugin_id'])
+        except Plugin.DoesNotExist:
+            raise BadRequest("Plugin Does Not Exist")
         return Alert.objects.create(
             key=self.data['key'],
-            escalation_id=escalation.id,
+            plugin_id=plugin.id,
             failure_time=self.data['failure_time'],
             failure_expiration=self.data['failure_expiration'],
             max_failures=self.data['max_failures']
@@ -58,11 +58,11 @@ class AlertResource(DjangoResource):
 
         if 'key' in self.data:
             alert.key = self.data['key']
-        if 'escalation_id' in self.data:
+        if 'plugin_id' in self.data:
             try:
-                escalation = Escalation.objects.get(self.data['escalation_id'], user_id=self.user.id)
-            except Escalation.DoesNotExist:
-                raise BadRequest("Escalation Does Not Exist")
+                plugin = Plugin.objects.get(self.data['plugin_id'])
+            except Plugin.DoesNotExist:
+                raise BadRequest("Plugin Does Not Exist")
             alert.escalation_id = escalation.id
         if 'failure_time' in self.data:
             alert.failure_time = self.data['failure_time']
