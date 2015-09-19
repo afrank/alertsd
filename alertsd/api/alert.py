@@ -13,7 +13,7 @@ from restless.exceptions import BadRequest
 class AlertResource(DjangoResource):
     preparer = FieldsPreparer(fields={
         'id': 'id',
-        'escalation_id': 'escalation_id',
+        'plugin_id': 'plugin_id',
         'key': 'key',
         'failure_time': 'failure_time',
         'failure_expiration': 'failure_expiration',
@@ -63,7 +63,7 @@ class AlertResource(DjangoResource):
                 plugin = Plugin.objects.get(self.data['plugin_id'])
             except Plugin.DoesNotExist:
                 raise BadRequest("Plugin Does Not Exist")
-            alert.escalation_id = escalation.id
+            alert.plugin_id = plugin.id
         if 'failure_time' in self.data:
             alert.failure_time = self.data['failure_time']
         if 'max_failures' in self.data:
