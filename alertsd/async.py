@@ -29,10 +29,9 @@ def start_incident_thread(incident_id):
         alert = Alert.objects.get(pk=incident.alert_id)
         if (alert.failure_time > 0 and now-start_time > alert.failure_time) or (alert.max_failures > 0 and incident.failure_count >= alert.max_failures):
             # ESCALATE!
-            print "Escalating incident_id %s alert_id %s" % (str(incident_id), str(alert.id))
-            escalation = Escalation.objects.get(pk=alert.escalation_id)
-            plugin = Plugin.objects.get(pk=escalation.plugin_id)
+            plugin = Plugin.objects.get(pk=alert.plugin_id)
             plugin_parameters = list(PluginParameter.objects.filter(plugin_id=plugin.id))
+            print "Escalating incident_id %s alert_id %s using %s plugin" % (str(incident_id), str(alert.id), plugin.name)
             import subprocess
             import os
 

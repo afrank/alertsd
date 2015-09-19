@@ -25,17 +25,10 @@ class PluginParameter(models.Model):
     created_on = models.DateTimeField(auto_now_add=True,auto_now=False)
     updated_on = models.DateTimeField(auto_now_add=True,auto_now=True)
 
-class Escalation(models.Model):
-    user = models.ForeignKey(User)
-    plugin = models.ForeignKey(Plugin)
-    escalation_interval = models.IntegerField(default=0) # setting this to >0 will result in a recurring escalation
-    created_on = models.DateTimeField(auto_now_add=True,auto_now=False)
-    updated_on = models.DateTimeField(auto_now_add=True,auto_now=True)
-
 # the structure of an alert as it traverses the system.
 class Alert(models.Model):
     alert_key = models.CharField(max_length=255, unique=True) # this is the key used to call this alert in the API
-    escalation = models.ForeignKey(Escalation)
+    plugin = models.ForeignKey(Plugin)
     created_on = models.DateTimeField(auto_now_add=True,auto_now=False)
     failure_time = models.IntegerField(default=0) # the amount of time (in seconds) from when the first alert is received to wait for a recovery before escalating
     max_failures = models.IntegerField(default=0) # don't escalate until X failures are received for an alert
