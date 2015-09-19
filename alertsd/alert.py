@@ -40,7 +40,7 @@ class AlertEndpoint(Endpoint):
             raise BadRequest("User Does Not Exist")
 
         try:
-            alert = Alert.objects.get(key=key,escalation__user_id=user.id)
+            alert = Alert.objects.get(key=key,user_id=user.id)
         except Alert.DoesNotExist:
             raise BadRequest("Specified Alert Does Not Exist.")
 
@@ -53,7 +53,7 @@ class AlertEndpoint(Endpoint):
                     if re.match(f.regex,value) is not None:
                         return {'msg':'Not Triggering since value string matches associated filter %s' % str(f.id)}
 
-        # check for an existing escalation.
+        # check for an existing incident.
         try:
             incident = Incident.objects.get(alert_id=alert.id,value=value)
             if action == "resolve":

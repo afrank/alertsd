@@ -28,6 +28,7 @@ class PluginParameter(models.Model):
 # the structure of an alert as it traverses the system.
 class Alert(models.Model):
     key = models.CharField(max_length=255, unique=True) # this is the key used to call this alert in the API
+    user = models.ForeignKey(User)
     plugin = models.ForeignKey(Plugin)
     created_on = models.DateTimeField(auto_now_add=True,auto_now=False)
     failure_time = models.IntegerField(default=0) # the amount of time (in seconds) from when the first alert is received to wait for a recovery before escalating

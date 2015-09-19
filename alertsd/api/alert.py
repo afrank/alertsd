@@ -21,10 +21,10 @@ class AlertResource(DjangoResource):
         'created_on': 'created_on'
     })
     def list(self):
-        return Alert.objects.filter(escalation__user_id=self.user.id)
+        return Alert.objects.filter(user_id=self.user.id)
 
     def detail(self, pk):
-        return Alert.objects.get(id=pk, escalation__user_id=self.user.id)
+        return Alert.objects.get(id=pk, user_id=self.user.id)
 
     def is_authenticated(self):
         if "HTTP_AUTH_TOKEN" in self.request.META:
@@ -45,6 +45,7 @@ class AlertResource(DjangoResource):
         return Alert.objects.create(
             key=self.data['key'],
             plugin_id=plugin.id,
+            user_id=self.user.id,
             failure_time=self.data['failure_time'],
             failure_expiration=self.data['failure_expiration'],
             max_failures=self.data['max_failures']
@@ -52,7 +53,7 @@ class AlertResource(DjangoResource):
 
     def update(self, pk):
         try:
-            alert = Alert.objects.get(id=pk, escalation__user_id=self.user.id)
+            alert = Alert.objects.get(id=pk, user_id=self.user.id)
         except Alert.DoesNotExist:
             raise BadRequest("Alert Not Found")
 
@@ -75,7 +76,7 @@ class AlertResource(DjangoResource):
 
     def delete(self, pk):
         try:
-            alert = Alert.objects.get(id=pk, escalation__user_id=self.user.id)
+            alert = Alert.objects.get(id=pk, user_id=self.user.id)
         except Alert.DoesNotExist:
             raise BadRequest("Alert not found.")
         alert.delete()

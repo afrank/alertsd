@@ -19,10 +19,10 @@ class IncidentResource(DjangoResource):
         'updated_on': 'updated_on'
     })
     def list(self):
-        return Incident.objects.filter(alert__escalation__user_id=self.user.id)
+        return Incident.objects.filter(alert__user_id=self.user.id)
 
     def detail(self, pk):
-        return Incident.objects.get(id=pk, alert__escalation__user_id=self.user.id)
+        return Incident.objects.get(id=pk, alert__user_id=self.user.id)
 
     def is_authenticated(self):
         if "HTTP_AUTH_TOKEN" in self.request.META:
@@ -37,20 +37,20 @@ class IncidentResource(DjangoResource):
 
     def create(self):
         try:
-            alert = Alert.objects.get(alert_id=self.data['alert_id'], alert__escalation__user_id=self.user.id)
+            alert = Alert.objects.get(alert_id=self.data['alert_id'], alert__user_id=self.user.id)
         except Alert.DoesNotExist:
             raise BadRequest("Alert Not Found")
         return Incident.objects.create(alert_id=alert.id)
 
     def update(self, pk):
         try:
-            incident = Incident.objects.get(id=pk, alert__escalation__user_id=self.user.id)
+            incident = Incident.objects.get(id=pk, alert__user_id=self.user.id)
         except Incident.DoesNotExist:
             raise BadRequest("Incident Not Found")
 
         if 'alert_id' in self.data:
             try:
-                alert = Alert.objects.get(id=self.data['alert_id'], escalation__user_id=self.user.id)
+                alert = Alert.objects.get(id=self.data['alert_id'], user_id=self.user.id)
             except Alert.DoesNotExist:
                 raise BadRequest("Alert Not Found")
             incident.alert_id = alert.id
@@ -61,7 +61,7 @@ class IncidentResource(DjangoResource):
 
     def delete(self, pk):
         try:
-            incident = Incident.objects.get(id=pk, alert__escalation__user_id=self.user.id)
+            incident = Incident.objects.get(id=pk, alert__user_id=self.user.id)
         except Incident.DoesNotExist:
             raise BadRequest("Incident not found.")
         incident.delete()

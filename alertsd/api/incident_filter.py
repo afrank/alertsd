@@ -19,10 +19,10 @@ class IncidentFilterResource(DjangoResource):
         'updated_on': 'updated_on'
     })
     def list(self):
-        return IncidentFilter.objects.filter(alert__escalation__user_id=self.user.id)
+        return IncidentFilter.objects.filter(alert__user_id=self.user.id)
 
     def detail(self, pk):
-        return IncidentFilter.objects.get(id=pk, alert__escalation__user_id=self.user.id)
+        return IncidentFilter.objects.get(id=pk, alert__user_id=self.user.id)
 
     def is_authenticated(self):
         if "HTTP_AUTH_TOKEN" in self.request.META:
@@ -37,20 +37,20 @@ class IncidentFilterResource(DjangoResource):
 
     def create(self):
         try:
-            alert = Alert.objects.get(alert_id=self.data['alert_id'], alert__escalation__user_id=self.user.id)
+            alert = Alert.objects.get(alert_id=self.data['alert_id'], alert__user_id=self.user.id)
         except Alert.DoesNotExist:
             raise BadRequest("Alert Not Found")
         return IncidentFilter.objects.create(alert_id=alert.id)
 
     def update(self, pk):
         try:
-            _filter = IncidentFilter.objects.get(id=pk, alert__escalation__user_id=self.user.id)
+            _filter = IncidentFilter.objects.get(id=pk, alert__user_id=self.user.id)
         except IncidentFilter.DoesNotExist:
             raise BadRequest("IncidentFilter Not Found")
 
         if 'alert_id' in self.data:
             try:
-                alert = Alert.objects.get(id=self.data['alert_id'], escalation__user_id=self.user.id)
+                alert = Alert.objects.get(id=self.data['alert_id'], user_id=self.user.id)
             except Alert.DoesNotExist:
                 raise BadRequest("Alert Not Found")
             _filter.alert_id = alert.id
@@ -61,7 +61,7 @@ class IncidentFilterResource(DjangoResource):
 
     def delete(self, pk):
         try:
-            _filter = IncidentFilter.objects.get(id=pk, alert__escalation__user_id=self.user.id)
+            _filter = IncidentFilter.objects.get(id=pk, alert__user_id=self.user.id)
         except IncidentFilter.DoesNotExist:
             raise BadRequest("IncidentFilter not found.")
         _filter.delete()
