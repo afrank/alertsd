@@ -10,7 +10,7 @@ class User(models.Model):
 # these are escalation plugins that get called via subprocesses with parameters passed via environment
 # variables.
 class Plugin(models.Model):
-    name = models.CharField(max_length=25)
+    name = models.CharField(max_length=25, unique=True)
     path = models.CharField(max_length=255) # this is chrooted to <BASEDIR>/plugins
     required_parameters = models.CharField(max_length=255) # comma-delimited list of variables the plugin depends on
     created_on = models.DateTimeField(auto_now_add=True,auto_now=False)
