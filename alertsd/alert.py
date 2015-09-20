@@ -46,7 +46,7 @@ class AlertEndpoint(Endpoint):
 
         # see if there are any filters that would prevent this from triggering
         if value <> "":
-            filters = list(AlertFilter.objects.filter(alert_id=alert.id))
+            filters = list(IncidentFilter.objects.filter(alert_id=alert.id))
             if len(filters) > 0:
                 import re
                 for f in filters:
@@ -64,7 +64,7 @@ class AlertEndpoint(Endpoint):
                 incident.failure_count += 1
                 incident.save()
         except Incident.DoesNotExist:
-            incident = Incident.objects.create(alert_id=alert.id, failure_count=1)
+            incident = Incident.objects.create(alert_id=alert.id, value=value, failure_count=1)
             start_incident_thread.delay(incident.id)
 
         return {"alert_id":incident.alert_id, "key":alert.key, "value":incident.value, "failure_count":incident.failure_count, "created_on":incident.created_on, "updated_on":incident.updated_on}

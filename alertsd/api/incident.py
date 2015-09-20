@@ -16,7 +16,8 @@ class IncidentResource(DjangoResource):
         'alert_id': 'alert_id',
         'failure_count': 'failure_count',
         'created_on': 'created_on',
-        'updated_on': 'updated_on'
+        'updated_on': 'updated_on',
+        'value': 'value'
     })
     def list(self):
         return Incident.objects.filter(alert__user_id=self.user.id)
