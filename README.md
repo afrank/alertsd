@@ -23,3 +23,27 @@ git clone https://github.com/afrank/alertsd.git
 cd alertsd
 sudo ./install.sh
 ```
+
+## How do I use this glorious tool?!
+
+Once you've installed alertsd, by either using the "trying it out" method or the "installing" method, you need to send some data to it. You can put some sample data in it by using the [create_db.sh](create_db.sh) script, but let's discuss what's happening here, so you can form these calls to meet your needs. 
+
+### Create a user
+
+By design, this api endpoint can only be queried from localhost. This is because alertsd (currently) has no concept of a superuser, so superuser commands are run from localhost. A user is a top-level model; the only required argument is an api key, which is just a string that could be virtually anything (though I like using uuids). So you could do something like:
+```
+api_key=$(uuidgen)
+curl -s -X POST -d "{\"api_key\":\"$api_key\"}" $base_url/api/user/ | python -m json.tool
+```
+
+### Create an alert
+```
+curl -s -X POST -H "Auth-Token: $api_key" -d '{"key":"testing.key","plugin_id":1,"failure_time":300,"max_failures":5,"failure_expiration":60}' $base_url/api/alert/ | python -m json.tool
+```
+
+## Plugins
+Plugins dictate the way escalations are handled. When an incident is escalated based on the alert rules, the plugin is executed as a sub-process with various things passed to it as environment variables. Using the sub-process with environment variables means plugins can be written in any scripting language.
+
+```python manage.py syncplugins```
+
+
