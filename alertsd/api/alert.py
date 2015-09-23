@@ -61,7 +61,7 @@ class AlertResource(DjangoResource):
             alert.key = self.data['key']
         if 'plugin_id' in self.data:
             try:
-                plugin = Plugin.objects.get(self.data['plugin_id'])
+                plugin = Plugin.objects.get(pk=self.data['plugin_id'])
             except Plugin.DoesNotExist:
                 raise BadRequest("Plugin Does Not Exist")
             alert.plugin_id = plugin.id
