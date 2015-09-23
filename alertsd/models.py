@@ -16,15 +16,6 @@ class Plugin(models.Model):
     created_on = models.DateTimeField(auto_now_add=True,auto_now=False)
     updated_on = models.DateTimeField(auto_now_add=True,auto_now=True)
 
-# these are simply parameters, like api keys, that are passed to plugins when they're excecuted, as environment variables
-class PluginParameter(models.Model):
-    user = models.ForeignKey(User)
-    plugin = models.ForeignKey(Plugin)
-    key = models.CharField(max_length=25)
-    value = models.CharField(max_length=255)
-    created_on = models.DateTimeField(auto_now_add=True,auto_now=False)
-    updated_on = models.DateTimeField(auto_now_add=True,auto_now=True)
-
 # the structure of an alert as it traverses the system.
 class Alert(models.Model):
     key = models.CharField(max_length=255, unique=True) # this is the key used to call this alert in the API
@@ -37,6 +28,15 @@ class Alert(models.Model):
     updated_on = models.DateTimeField(auto_now_add=True,auto_now=True)
     # TODO something about flap detection/mitigation
     # TODO escalation persistence
+
+# these are simply parameters, like api keys, that are passed to plugins when they're excecuted, as environment variables
+class PluginParameter(models.Model):
+    plugin = models.ForeignKey(Plugin)
+    alert = models.ForeignKey(Alert)
+    key = models.CharField(max_length=25)
+    value = models.CharField(max_length=255)
+    created_on = models.DateTimeField(auto_now_add=True,auto_now=False)
+    updated_on = models.DateTimeField(auto_now_add=True,auto_now=True)
 
 # this is basically a cache where active escalations will be tracked.
 class Incident(models.Model):
