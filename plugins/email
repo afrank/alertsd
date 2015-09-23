@@ -1,0 +1,26 @@
+#!/usr/bin/python
+
+# required_parameters: address
+
+import os
+import smtplib
+import time
+from email.mime.text import MIMEText
+
+alert_key = os.environ['ALERT_KEY']
+failure_count = os.environ['FAILURE_COUNT']
+incident_start = os.environ['INCIDENT_START']
+incident_details = os.environ['INCIDENT_DETAILS']
+address = os.environ['address']
+
+sent_from = "alertsd@roberto"
+
+subject = "ALERT: %s failed %s times" % (str(alert_key),str(failure_count))
+message = MIMEText("%s \n %s \n %s \n %s \n %s" % (alert_key,failure_count,incident_start,incident_details,address))
+message['Subject'] = subject
+message['From'] = sent_from
+message['To'] = address
+
+s = smtplib.SMTP('localhost')
+s.sendmail(sent_from, [address], message.as_string())
+s.quit()
