@@ -37,10 +37,10 @@ class IncidentFilterResource(DjangoResource):
 
     def create(self):
         try:
-            alert = Alert.objects.get(alert_id=self.data['alert_id'], alert__user_id=self.user.id)
+            alert = Alert.objects.get(pk=self.data['alert_id'], user_id=self.user.id)
         except Alert.DoesNotExist:
             raise BadRequest("Alert Not Found")
-        return IncidentFilter.objects.create(alert_id=alert.id)
+        return IncidentFilter.objects.create(alert_id=alert.id, regex=self.data['regex'])
 
     def update(self, pk):
         try:
@@ -50,7 +50,7 @@ class IncidentFilterResource(DjangoResource):
 
         if 'alert_id' in self.data:
             try:
-                alert = Alert.objects.get(id=self.data['alert_id'], user_id=self.user.id)
+                alert = Alert.objects.get(pk=self.data['alert_id'], user_id=self.user.id)
             except Alert.DoesNotExist:
                 raise BadRequest("Alert Not Found")
             _filter.alert_id = alert.id
