@@ -1,0 +1,18 @@
+#!/usr/bin/python
+
+# required_parameters: webhook_url, channel
+
+import os
+import requests
+import json
+
+alert_key = os.environ['ALERT_KEY']
+failure_count = os.environ['FAILURE_COUNT']
+incident_start = os.environ['INCIDENT_START']
+incident_details = os.environ['INCIDENT_DETAILS']
+webhook_url = os.environ['webhook_url']
+channel = os.environ['channel']
+
+subject = "ALERT: %s failed %s times" % (str(alert_key),str(failure_count))
+payload = {"text":subject, "channel": channel, "username": "alertsd" }
+requests.post(webhook_url,json.dumps(payload))
