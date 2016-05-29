@@ -43,3 +43,27 @@ curl -s -X POST -H "Auth-Token: $api_key" -d '{"plugin_id":$plugin_id,"alert_id"
 ## A note about plugins
 Plugins dictate the way escalations are handled. When an incident is escalated based on the alert rules, the plugin is executed as a sub-process with various things passed to it as environment variables. Using the sub-process with environment variables means plugins can be written in any scripting language.
 
+## Client Library
+
+A basic python client library is included. It can be installed by running `sudo pip install --upgrade git+https://github.com/afrank/alertsd`.
+
+Example Usage:
+```
+#!/usr/bin/python
+
+from alertsd import Alertsd
+
+api_key = "7f8b419a-25bb-11e6-a813-002590eb817c" # this is just a made-up string
+
+c = Alertsd('http://localhost:8080',api_key)
+
+print(c.create_user())
+
+key = 'testing.key'
+
+print(c.create_alert(key, plugin='pagerduty', failure_time=300, max_failures=5, failure_expiration=60))
+print(c.add_param(key,'pagerduty','api_key','YOUR_PAGERDUTY_API_KEY'))
+print(c.add_param(key,'pagerduty','service_key','YOUR_PAGERDUTY_SERVICE_KEY'))
+
+print(c.trigger(key,'OMG EVERYTHING IS ON FIRE!!!!'))
+```
