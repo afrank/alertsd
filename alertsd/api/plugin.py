@@ -21,8 +21,8 @@ class PluginResource(DjangoResource):
     def list(self):
         return Plugin.objects.all()
 
-    def detail(self, pk):
-        return Plugin.objects.get(id=pk)
+    def detail(self, name):
+        return Plugin.objects.get(name=name)
 
     def is_authenticated(self):
         self.writable = False

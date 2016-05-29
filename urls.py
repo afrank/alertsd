@@ -23,7 +23,7 @@ urlpatterns = patterns('',
     url(r'^api/user/(?P<pk>\d+)/$', UserResource.as_detail(), name='api_user_detail'),
 
     url(r'^api/alert/$', AlertResource.as_list(), name='api_alert_list'),
-    url(r'^api/alert/(?P<pk>\d+)/$', AlertResource.as_detail(), name='api_alert_detail'),
+    url(r'^api/alert/(?P<name>.+)/$', AlertResource.as_detail(), name='api_alert_detail'),
 
     url(r'^api/incident/$', IncidentResource.as_list(), name='api_incident_list'),
     url(r'^api/incident/(?P<pk>\d+)/$', IncidentResource.as_detail(), name='api_incident_detail'),
@@ -32,10 +32,10 @@ urlpatterns = patterns('',
     url(r'^api/incident/filter/(?P<pk>\d+)/$', IncidentFilterResource.as_detail(), name='api_incident_filter_detail'),
 
     url(r'^api/plugin/$', PluginResource.as_list(), name='api_plugin_list'),
-    url(r'^api/plugin/(?P<pk>\d+)/$', PluginResource.as_detail(), name='api_plugin_detail'),
+    url(r'^api/plugin/(?P<name>.+)/$', PluginResource.as_detail(), name='api_plugin_detail'),
 
-    url(r'^api/plugin/parameter/$', PluginParameterResource.as_list(), name='api_plugin_parameter_list'),
-    url(r'^api/plugin/parameter/(?P<pk>\d+)/$', PluginParameterResource.as_detail(), name='api_plugin_parameter_detail'),
+    url(r'^api/plugin_parameter/$', PluginParameterResource.as_list(), name='api_plugin_parameter_list'),
+    url(r'^api/plugin_parameter/(?P<pk>\d+)/$', PluginParameterResource.as_detail(), name='api_plugin_parameter_detail'),
 
     url(r'^alert/$', AlertEndpoint.as_view(), name='AlertEndpoint'),
 )

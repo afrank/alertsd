@@ -23,8 +23,8 @@ class AlertResource(DjangoResource):
     def list(self):
         return Alert.objects.filter(user_id=self.user.id)
 
-    def detail(self, pk):
-        return Alert.objects.get(id=pk, user_id=self.user.id)
+    def detail(self, name):
+        return Alert.objects.get(key=name, user_id=self.user.id)
 
     def is_authenticated(self):
         if "HTTP_AUTH_TOKEN" in self.request.META:
