@@ -1,49 +1,45 @@
 # alertsd
 
-Doing alerts right is kinda hard. In the glorious world of devops, you want to do adhoc alerting, where you've got a few different products all implementing their own alerting rules, tied in to any number of things. Finding something wrong and sending an alert? Not that tough. But introducing things like escalations, flap detection, check intervals, notification intervals, and any number of other things you can find in such things as Nagios are non-trivial to implement, and take away from more important tasks. Ok, so why not just use nagios, or something like it. Well, you can! But setting nagios up is non-trivial, especially for a developer who's not otherwise inclined to do ops stuff, and with nagios comes lots of stuff you maybe don't want.
+Doing alerts right is kinda hard. In the glorious world of devops, you want to do adhoc alerting, where you've got a few different products all implementing their own alerting rules, tied in to any number of things. Finding something wrong and sending an alert is not too tough, but implementing certain alerting concepts like escalations, flap detection, check intervals, notification intervals, etc. are non-trivial, and take away from more important tasks (like improving your application!). Ok, so why not just use nagios, or something like it. Well, you can! But setting up nagios is non-trivial and could be a bit heavy-handed depending on your use case.
 
-Alertsd attempts to make the distinction between monitoring, alerting, and notifications. In the ever-increasing world of devops this is becoming a critical distinction. Monitoring is something developers and devops people can do really well. Good monitoring requires intimate understanding of the system you're trying to monitor, whether it's CPU temperature or some metric within a java application. Notifications is something pagerduty (and things like pagerduty) does really well. They take the hassle out of sending email, making phone calls and SMS, and doing team escalations. Alertsd fits between these two things, and adds certain features that are difficult to implement in a monitoring system, especially if it's stateless (like a cron script).
+To clearly see how alertsd fits into a monitoring workflow, let's consider monitoring as comprised of three distinct concepts: Monitoring, Alerting and Notification. The distinction between Monitoring/Alerting and Notification is widely-established; as apps have moved into public clouds where doing email-based notifications isn't as easy as it used to be (or maybe you just don't want to run your own SMTP), notifications are increasingly handled by 3rd-party services (Pagerduty is excellent at this). Alertsd goes one step further and breaks up the relationship between monitoring and alerting.
 
-Another benefit of something like this is it gives you an escalation proxy, so instead of having a bunch of nodes sending email or making API calls to pagerduty, you can do all that from here. Your firewall will thank you.
+Example Workflow:
 
-## Trying it out
+- Monitoring: A monitor can be as simple as a curl against a web port, or a cron job that scrapes a log. It doesn't need to maintain state, because that happens at the Alert layer. (TODO: Provide example monitors)
+- Alerting: When a monitor discovers a problem, it makes an API call to the alerting layer (alertsd), which maintains the state of the alert, and knows certain things, like how many failures can happen in a given time box before escalating to the Notification layer.
+- If an alert has received a sufficient number of failures from a monitor it will trigger a notification. It uses an escalation plugin to interface with an external notification layer, like SMTP, or preferrably Pagerduty.
 
-To try this out, you'll need Python-Django, RabbitMQ and celery. Once you've installed those things, started your rabbitmq daemon and cloned this repo, run ```python manage.py syncdb```. You can then run the dev server with ```python manage.py runserver 0.0.0.0:8000```. To start your celery worker, run ```celery -A alertsd worker -l info```.
-
-Assuming all of that worked, you can create some data in your db by running ```./create_db.sh```. Then to play around with triggering and resolving incidents, run ```./trigger.sh``` and ```./resolve.sh```.
+Another benefit of something like this is it gives you an escalation proxy, so instead of having a bunch of nodes sending email or making API calls to pagerduty, you can do all that from here. *Your firewall will thank you*.
 
 ## Installing
-
-When you're done trying it out, you can take a few steps to install it in a more productized way. Have a look at the included [install.sh](install.sh). You will need RabbitMQ, Celeryd, Supervisor, Nginx, Gunicorn and Django. If you've got all that stuff installed, then you should be able to simply run the install script. 
-
-Running these commands should result in a running alertsd instance on your vanilla ubuntu 14 box:
-```
-sudo apt-get install -y git-core
-git clone https://github.com/afrank/alertsd.git
-cd alertsd
-sudo ./install.sh
-```
-
-## How do I use this glorious tool?!
-
-Once you've installed alertsd, by either using the "trying it out" method or the "installing" method, you need to send some data to it. You can put some sample data in it by using the [create_db.sh](create_db.sh) script, but let's discuss what's happening here, so you can form these calls to meet your needs. 
+Alertsd is dockerized, so you can install the latest version simply by running `docker pull afrank/alertsd` then `docker run -p 8080:8080 -d afrank/alertsd`. If you're undocker, you can also play around with the [install.sh](install.sh) script. Once you've installed the container, you will want to add a user and an alerting target.
 
 ### Create a user
-
-By design, this api endpoint can only be queried from localhost. This is because alertsd (currently) has no concept of a superuser, so superuser commands are run from localhost. A user is a top-level model; the only required argument is an api key, which is just a string that could be virtually anything (though I like using uuids). So you could do something like:
 ```
 api_key=$(uuidgen)
+base_url=http://localhost:8080
 curl -s -X POST -d "{\"api_key\":\"$api_key\"}" $base_url/api/user/ | python -m json.tool
 ```
 
-### Create an alert
+### List available plugins
 ```
-curl -s -X POST -H "Auth-Token: $api_key" -d '{"key":"testing.key","plugin_id":1,"failure_time":300,"max_failures":5,"failure_expiration":60}' $base_url/api/alert/ | python -m json.tool
+curl -s -X GET -H "Auth-Token: $api_key" $base_url/api/plugin/ | python -m json.tool
 ```
 
-## Plugins
+### Create an alerting target
+```
+plugin_id=3
+curl -s -X POST -H "Auth-Token: $api_key" -d '{"key":"testing.key","plugin_id":$plugin_id,"failure_time":300,"max_failures":5,"failure_expiration":60}' $base_url/api/alert/ | python -m json.tool
+# record your alert_id
+```
+If you're using a plugin that requires parameters (like pagerduty), you should associate those parameters with your alert/plugin pair:
+```
+alert_id=1
+curl -s -X POST -H "Auth-Token: $api_key" -d '{"plugin_id":$plugin_id,"alert_id":$alert_id,"key":"api_key","value":"YOUR_PAGERDUTY_API_KEY"}' $base_url/api/plugin/parameter/ | python -m json.tool
+curl -s -X POST -H "Auth-Token: $api_key" -d '{"plugin_id":$plugin_id,"alert_id":$alert_id,"key":"service_key","value":"YOUR_PAGERDUTY_SERVICE_KEY"}' $base_url/api/plugin/parameter/ | python -m json.tool
+```
+
+## A note about plugins
 Plugins dictate the way escalations are handled. When an incident is escalated based on the alert rules, the plugin is executed as a sub-process with various things passed to it as environment variables. Using the sub-process with environment variables means plugins can be written in any scripting language.
-
-```python manage.py syncplugins```
-
 

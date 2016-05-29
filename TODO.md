@@ -1,10 +1,10 @@
 # TODO
 
+## client library
+
 ## endpoint for a client to query to see if it should check again or not (+1)
 
 ## clean up abandoned incidents (an incident in the db with no running thread) (+1)
-
-## add a pagerduty plugin (+1)
 
 ## better mechanisms for filtering out certain metrics (done, untested)
 
