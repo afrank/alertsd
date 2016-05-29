@@ -3,7 +3,7 @@ from distutils.core import setup
 from setuptools import find_packages
 
 setup(
-    name='alertsd_client',
+    name='alertsd',
     version='0.0.1',
     author='afrank',
     author_email='adam@antilogo.org',
