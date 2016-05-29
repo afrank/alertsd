@@ -1,7 +1,7 @@
 #!/bin/bash
 
 NAME="alertsd"                              #Name of the application (*)
-DJANGODIR="/opt/alertsd"             # Django project directory (*)
+DJANGODIR="/opt"             # Django project directory (*)
 SOCKFILE="/opt/alertsd/run/gunicorn.sock"        # we will communicate using this unix socket (*)
 USER=www-data                                        # the user to run as (*)
 GROUP=www-data                                     # the group to run as (*)
