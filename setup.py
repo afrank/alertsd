@@ -23,7 +23,7 @@ setup(
         'Programming Language :: Python :: 3.4',
     ],
 
-    packages=find_packages(),
+    packages=find_packages('client'),
     include_package_data=True,
     install_requires = [
         'simplejson',
