@@ -24,6 +24,7 @@ setup(
     ],
 
     packages=find_packages('client'),
+    package_dir = {'':'client'},
     include_package_data=True,
     install_requires = [
         'simplejson',
