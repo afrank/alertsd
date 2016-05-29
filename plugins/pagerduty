@@ -1,0 +1,38 @@
+#!/usr/bin/python
+
+# required_parameters: api_key, service_key
+
+import json
+import requests
+import os
+
+alert_key = os.environ['ALERT_KEY']
+failure_count = os.environ['FAILURE_COUNT']
+incident_start = os.environ['INCIDENT_START']
+incident_details = os.environ['INCIDENT_DETAILS']
+
+api_key = os.environ.get('api_key')
+service_key = os.environ.get('service_key')
+
+headers = {
+    'Authorization': 'Token token={0}'.format(api_key),
+    'Content-type': 'application/json',
+}
+payload = json.dumps({
+    "service_key": "{0}".format(service_key),
+    "event_type": "trigger",
+    "description": "ALERT: {0} failed {1} times".format(alert_key,failure_count),
+    "client": "alertsd",
+    "details": {
+        "alert_key":alert_key,
+        "failure_count":failure_count,
+        "incident_start":incident_start,
+        "incident_details":incident_details,
+    }
+})
+r = requests.post(
+    'https://events.pagerduty.com/generic/2010-04-15/create_event.json',
+    headers=headers,
+    data=payload,
+)
+
