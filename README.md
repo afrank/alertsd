@@ -8,9 +8,9 @@ Example Workflow:
 
 - Monitoring: A monitor can be as simple as a curl against a web port, or a cron job that scrapes a log. It doesn't need to maintain state, because that happens at the Alert layer. (TODO: Provide example monitors)
 - Alerting: When a monitor discovers a problem, it makes an API call to the alerting layer (alertsd), which maintains the state of the alert, and knows certain things, like how many failures can happen in a given time box before escalating to the Notification layer.
-- If an alert has received a sufficient number of failures from a monitor it will trigger a notification. It uses an escalation plugin to interface with an external notification layer, like SMTP, or preferrably Pagerduty.
+- Notification: If an alert has received a sufficient number of failures from a monitor it will trigger a notification. It uses an escalation plugin to interface with an external notification layer, like SMTP, or preferrably Pagerduty.
 
-Another benefit of something like this is it gives you an escalation proxy, so instead of having a bunch of nodes sending email or making API calls to pagerduty, you can do all that from here. *Your firewall will thank you*.
+Another benefit of something like this is it gives you an escalation proxy, so instead of having a bunch of nodes sending email or making API calls to pagerduty, you can do all that from here. _Your firewall will thank you_.
 
 ## Installing
 Alertsd is dockerized, so you can install the latest version simply by running `docker pull afrank/alertsd` then `docker run -p 8080:8080 -d afrank/alertsd`. If you're undocker, you can also play around with the [install.sh](install.sh) script. Once you've installed the container, you will want to add a user and an alerting target.
@@ -66,4 +66,5 @@ print(c.add_param(key,'pagerduty','api_key','YOUR_PAGERDUTY_API_KEY'))
 print(c.add_param(key,'pagerduty','service_key','YOUR_PAGERDUTY_SERVICE_KEY'))
 
 print(c.trigger(key,'OMG EVERYTHING IS ON FIRE!!!!'))
+print(c.resolve(key,'OMG EVERYTHING IS ON FIRE!!!!'))
 ```
