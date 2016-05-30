@@ -1,0 +1,63 @@
+#!/usr/bin/python
+
+from alertsd import Alertsd
+import os
+import sys
+import getopt
+
+def usage():
+    print "alertsd_cli -- Command-line tool for alertsd"
+    print "%-20s %20s" % ("-a|--action","list_alerts|list_plugins|list_incidents|trigger|resolve")
+    print "%-20s %20s" % ("--api-key","Alertsd API Key")
+    print "%-20s %20s" % ("-h|--host","Alertsd Host")
+    print "%-20s %20s" % ("-k|--key","Alert key")
+    print "%-20s %20s" % ("-v|--val","Alert value")
+    print "host and api-key can also be set with the environment variables, ALERTSD_HOST and ALERTSD_API_KEY"
+
+api_key = os.environ.get('ALERTSD_API_KEY',None)
+host = os.environ.get('ALERTSD_HOST',None)
+action = None
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:], "a:X:h:v:k:", ["action=", "api-key=", "host=", "val=", "key="])
+except getopt.GetoptError as err:
+    usage()
+    print str(err)
+    sys.exit(2)
+for o, a in opts:
+    if o in ("-a", "--action"):
+        action = a
+    elif o in ("--api-key"):
+        api_key = a
+    elif o in ("-h", "--host"):
+        host = a
+    elif o in ("-k", "--key"):
+        key = a
+    elif o in ("-v", "--val"):
+        val = a
+    else:
+        usage()
+        assert False, "unhandled option"
+
+_alertsd = Alertsd(host,api_key)
+
+if action is None:
+    usage()
+    exit(1)
+
+if action == 'list_alerts':
+    alerts = _alertsd.list_alerts()
+    for a in alerts:
+        print "%(key)-20s %(failure_expiration)-20s %(max_failures)-20s %(failure_time)-20s %(plugin)-20s %(created_on)-20s" % a
+if action == 'list_plugins':
+    plugins = _alertsd.list_plugins()
+    for p in plugins:
+        print "%(name)-20s" % p
+if action == 'list_incidents':
+    incidents = _alertsd.list_incidents()
+    for i in incidents:
+        print "%(name)-20s" % i
+if action == 'trigger':
+    print _alertsd.trigger(key,val)
+if action == 'resolve':
+    print _alertsd.resolve(key,val)

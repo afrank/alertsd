@@ -14,6 +14,18 @@ class Alertsd:
         headers = { 'Auth-Token': self.api_key }
         url = "{0}/api/alert/{1}/".format(self.hostname,alert_key)
         return json.loads(requests.get(url,headers=headers).text)
+    def list_alerts(self):
+        headers = { 'Auth-Token': self.api_key }
+        url = "{0}/api/alert/".format(self.hostname)
+        return json.loads(requests.get(url, headers=headers).text)['objects']
+    def list_incidents(self):
+        headers = { 'Auth-Token': self.api_key }
+        url = "{0}/api/incident/".format(self.hostname)
+        return json.loads(requests.get(url, headers=headers).text)['objects']
+    def list_plugins(self):
+        headers = { 'Auth-Token': self.api_key }
+        url = "{0}/api/plugin/".format(self.hostname)
+        return json.loads(requests.get(url, headers=headers).text)['objects']
     def create_user(self,api_key=None):
         if api_key is None and self.api_key is None:
             import uuid
@@ -24,10 +36,6 @@ class Alertsd:
         url = "{0}/api/user/".format(self.hostname)
         self.user = json.loads(requests.post(url, json.dumps(payload)).text)
         return self.user
-    def list_plugins(self):
-        headers = { 'Auth-Token': self.api_key }
-        url = "{0}/api/plugin/".format(self.hostname)
-        return json.loads(requests.get(url, headers=headers).text)['objects']
     def create_alert(self,alert_key,**kwargs):
         headers = { 'Auth-Token': self.api_key }
         url = "{0}/api/alert/".format(self.hostname)

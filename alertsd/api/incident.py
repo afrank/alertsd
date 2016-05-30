@@ -13,7 +13,8 @@ from restless.exceptions import BadRequest
 class IncidentResource(DjangoResource):
     preparer = FieldsPreparer(fields={
         'id': 'id',
-        'alert_id': 'alert_id',
+        'alert': 'alert.key',
+        'plugin': 'alert.plugin.name',
         'failure_count': 'failure_count',
         'created_on': 'created_on',
         'updated_on': 'updated_on',
